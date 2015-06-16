@@ -21,7 +21,7 @@ test-suite tests
   Type:              exitcode-stdio-1.0
   HS-Source-Dirs:    tests
   Main-Is:           Main.hs
-  GHC-Options:       -Wall -tsopts
+  GHC-Options:       -Wall -rtsopts
   build-depends:     base >=4.7 && <4.8
                    , puzzlers
 
@@ -30,6 +30,7 @@ library
                    , SudokuGenerator
                    , KenKenSolver
                    , KenKenGenerator
+                   , LatinSquare
   -- other-modules:       
   -- other-extensions:    
   build-depends:     base >=4.7 && <4.8

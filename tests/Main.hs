@@ -1,9 +1,13 @@
 module Main (main) where
 
 import SudokuSolver
+import System.Exit (exitFailure, exitSuccess)
 
 main :: IO ()
-main = print $ puzzleSolution == sudoku puzzle
+main = do let sol = sudoku puzzle
+          let eq = sol == Just puzzleSolution
+          if not eq then exitFailure
+                    else exitSuccess
 
 puzzle :: [[Int]]
 puzzle = [[5,3,0,0,7,0,0,0,0],
