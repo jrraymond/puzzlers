@@ -1,4 +1,4 @@
-module KenKen where
+module KenKenSolver where
 
 import System.Random
 
