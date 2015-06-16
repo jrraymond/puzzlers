@@ -1,4 +1,4 @@
-module LatinSquare (genLatinSquare) where
+module LatinSquare where
 
 import System.Random
 
@@ -13,8 +13,7 @@ genLatinSquare gen dim = f gen 0 0 empty empty []
           | otherwise = let options = [ i | i <- [1..dim]
                                           , notElem i (rcs !! ri) 
                                             && notElem i (ccs !! ci) ]
-                            (ix, g') = randomR (0, length options - 1) g
-                            x = options !! ix
+                            (x, g') = randomElem g options
                             rcs' = addConstraint x ri rcs
                             ccs' = addConstraint x ci ccs
                         in f g' ri (ci + 1) rcs' ccs' (x : row)
@@ -22,3 +21,6 @@ genLatinSquare gen dim = f gen 0 0 empty empty []
 addConstraint :: Int -> Int -> [[Int]] -> [[Int]]
 addConstraint x i xss = take i xss ++ [x : (xss !! i)] ++ drop (i + 1) xss
 
+randomElem :: RandomGen g => g -> [Int] -> (Int, g)
+randomElem g xs = let (ix, g') = randomR (0, length xs - 1) g
+                  in (xs !! ix, g')

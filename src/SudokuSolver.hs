@@ -1,8 +1,12 @@
+module SudokuSolver where
 import Data.Maybe
 
-main :: IO ()
-main = do let sol = sudoku puzzle
-          print (sol == puzzleSolution)
+type Sudoku = [[Int]]
+data Difficulty = Easiest | Easy | Moderate | Hard | Evil
+type Board = [[(Int,Int,Int)]]
+type Row = [(Int,Int,Int)]
+type Col = Row
+type Box = Col
 
 sudoku :: [[Int]] -> [[Int]]
 sudoku board 
@@ -11,10 +15,6 @@ sudoku board
   where board' = populateIndexes board 
         solution = sudokuH board' board' 0 0
 
-type Board = [[(Int,Int,Int)]]
-type Row = [(Int,Int,Int)]
-type Col = Row
-type Box = Col
 
 sudokuH :: Board -> Board -> Int -> Int -> Maybe Board
 sudokuH _ ys 9 _ = Just ys
