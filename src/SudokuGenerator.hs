@@ -5,7 +5,6 @@ import System.Random.Shuffle (shuffle')
 import SudokuSolver
 import LatinSquare
 import Data.Maybe (isNothing, mapMaybe, fromJust)
-import Debug.Trace
 
 
 genSudoku :: RandomGen g => g -> Difficulty -> (Sudoku, Sudoku)

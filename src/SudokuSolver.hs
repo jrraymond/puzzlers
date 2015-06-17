@@ -3,7 +3,6 @@ import Data.Maybe
 import LatinSquare
 
 type Sudoku = [[Int]]
-data Difficulty = Easiest | Easy | Moderate | Hard | Evil
 type Board = [[(Int,Int,Int)]]
 type Row = [(Int,Int,Int)]
 type Col = Row
@@ -52,4 +51,3 @@ boxes s0 = go 0 0 (replicate 9 []) where
 
 getBoxI :: Int -> Int -> Int
 getBoxI r c = 3 * (r `div` 3) + (c `div` 3)
-

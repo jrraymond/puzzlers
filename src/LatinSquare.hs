@@ -3,6 +3,8 @@ module LatinSquare where
 import System.Random
 import Data.Maybe (fromJust, mapMaybe)
 
+data Difficulty = Easiest | Easy | Moderate | Hard | Evil
+
 genLatinSquare :: RandomGen g => g -> Int -> [[Int]]
 genLatinSquare gen dim = fromJust $ go gen 0 0 empty empty zeroes
   where empty = replicate dim []
@@ -36,3 +38,6 @@ modCell f ri ci xss = let xs = xss !! ri
 randomElem :: RandomGen g => g -> [a] -> (a, g)
 randomElem g xs = let (ix, g') = randomR (0, length xs - 1) g
                   in (xs !! ix, g')
+
+stepG :: RandomGen g => g -> g
+stepG g = let (_, g') = next g in g'
