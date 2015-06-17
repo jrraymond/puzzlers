@@ -1,11 +1,19 @@
 module Main (main) where
 
 import SudokuSolver
+import SudokuGenerator
 import System.Exit (exitFailure, exitSuccess)
+import System.Random
 
 main :: IO ()
 main = do let sol = sudoku puzzle
+          print sol
           let eq = sol == Just puzzleSolution
+          let sol2 = sudoku puzzleSolution
+          print sol2
+          let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
+          print gen_sudoku
+          print sol3
           if not eq then exitFailure
                     else exitSuccess
 
