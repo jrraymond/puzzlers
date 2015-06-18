@@ -29,6 +29,11 @@ genLatinSquare gen dim = fromJust $ go gen 0 0 empty empty zeroes
 addConstraint :: Int -> Int -> [[Int]] -> [[Int]]
 addConstraint x i xss = take i xss ++ [x : (xss !! i)] ++ drop (i + 1) xss
 
+
+modRow :: ([Int] -> [Int]) -> Int -> [[Int]] -> [[Int]]
+modRow f i xss = take i xss ++ [f (xss !! i)] ++ drop (i + 1) xss
+
+
 modCell :: (Int -> Int) -> Int -> Int -> [[Int]] -> [[Int]]
 modCell f ri ci xss = let xs = xss !! ri
                           c' = f (xs !! ci)

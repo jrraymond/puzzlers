@@ -14,12 +14,13 @@ main = do let sol = sudoku sudokuPuzzle
           let eq = sol == Just sudokuSolution
           let sol2 = sudoku sudokuSolution
           print sol2
-          let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easy
+          let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
           print gen_sudoku
           print sol3
-          let kenkensol = kenken kenkenPuzzle
-          let kenkeneq = kenkensol == Just kenkensol
-          if not eq && kenkeneq
+          let kenkensol = kenken (4, kenkenPuzzle)
+          let kenkeneq = kenkensol == Just  kenkenSolution
+          print kenkeneq
+          if not eq || not kenkeneq
             then exitFailure
             else exitSuccess
 
@@ -56,8 +57,8 @@ kenkenPuzzle = [ (divide  , 2, [(0,0),(1,0)])
                , (divide  , 2, [(3,1),(3,2)])
                , (multiply, 6, [(2,3),(3,3)]) ]
 
-kenKenSolution :: [[Int]]
-kenKenSolution = [[2,3,1,4]
+kenkenSolution :: [[Int]]
+kenkenSolution = [[2,3,1,4]
                  ,[4,2,3,1]
                  ,[3,1,4,2]
                  ,[1,4,2,3]]
