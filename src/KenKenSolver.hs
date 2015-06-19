@@ -1,6 +1,5 @@
 module KenKenSolver where
 
-import System.Random
 import Data.List (sortBy, tails, elemIndex, permutations, nub)
 import Data.Ord (comparing)
 import Data.Maybe (mapMaybe, fromJust, isJust)
@@ -33,24 +32,21 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
 
   go :: [([Int] -> Int, Int, [Int], [Int])] -> [[Int]] -> [[Int]] 
         -> [[Int]] -> Maybe [[Int]]
-  go [] _ _ sq = trace ("!!!!!!!!\n" ++ show sq) $ Just sq
+  go [] _ _ sq = Just sq
   go ((op, a, rixs, cixs):cs) rcs ccs sq
-    | trace (replicate 40 '-' ++ show (length cs)) False = undefined
     | length paths /= 1 = Nothing
     | otherwise = Just $ head paths
-    where debug = show a ++ "\t" ++ show (zip rixs cixs) ++ "\n" ++ show sq
-          opts = trace debug $ nub $ concatMap permutations $
-                          filter (\ns -> a == op ns) 
-                                 (combsMemo (length rixs))
-          paths = trace ("opts: " ++ show opts) $ mapMaybe try opts
-          --paths = mapMaybe try opts
+    where debug = "a: " ++ show a ++ "\n" ++ show sq
+          opts = nub $ concatMap permutations $
+                                 filter (\ns -> a == op ns) 
+                                        (combsMemo (length rixs))
+          paths = trace (replicate 20 '_' ++ "\n" ++ show debug) $ mapMaybe try opts
           try :: [Int] -> Maybe [[Int]]
           try [] = Nothing
           try xs 
-            | trace ("try: " ++ show xs ++ "\trcs: " ++ show rcs ++ "\tccs: " ++ show ccs) False = undefined
-            | not (ok xs rixs cixs rcs ccs) = trace ("not ok") Nothing
-            | dups xs rixs cixs = trace ("dups") Nothing
-            | otherwise = trace ("go: " ++ show (length cs)) $ go cs rcs' ccs' sq'
+            | not (ok xs rixs cixs rcs ccs) = Nothing
+            | dups xs rixs cixs = Nothing
+            | otherwise = go cs rcs' ccs' sq'
             where 
               rcs' = addConstraints xs rixs rcs
               ccs' = addConstraints xs cixs ccs
