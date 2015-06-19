@@ -16,9 +16,9 @@ main = do let sol = sudoku sEasy
           --print sol2 let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
           --print gen_sudoku
           --print sol3
-          let kenkensol = kenken (length kkEasy, kkEasy)
+          let kenkensol = kenken (length kkEasySol, kkEasy)
           let kenkeneq = kenkensol == Just  kkEasySol
-          let kenkensolH = kenken (length kkHard, kkHard)
+          let kenkensolH = kenken (length kkHardSol, kkHard)
           let kenkeneqH = kenkensolH == Just kkHardSol
           print kenkensol
           print kenkeneq

@@ -40,7 +40,7 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
           opts = nub $ concatMap permutations $
                                  filter (\ns -> a == op ns) 
                                         (combsMemo (length rixs))
-          paths = trace (replicate 20 '_' ++ "\n" ++ show debug) $ mapMaybe try opts
+          paths = trace (replicate 20 '_' ++ "\n" ++ debug) $ mapMaybe try opts
           try :: [Int] -> Maybe [[Int]]
           try [] = Nothing
           try xs 
