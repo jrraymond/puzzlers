@@ -1,11 +1,11 @@
 module Main (main) where
 
+import System.Random
 import SudokuSolver
 import SudokuGenerator
 import KenKenGenerator
 import KenKenSolver
 import Test.Framework (defaultMain, testGroup, Test)
---import Test.Framework
 import Test.Framework.Providers.HUnit
 import qualified Test.HUnit as HU
 
@@ -13,10 +13,40 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: [Test]
-tests = [ testGroup "Sudoku Solving" (hUnitTestToTests (sudoku_solving_tests))
-        , testGroup "KenKen Solving" (hUnitTestToTests (kenken_solving_tests))
+tests = [ testGroup "Sudoku Generating" (hUnitTestToTests sudoku_gen_tests)
+        , testGroup "Sudoku Solving" (hUnitTestToTests sudoku_solving_tests)
+        , testGroup "KenKen Generating" (hUnitTestToTests kenken_gen_tests)
+        , testGroup "KenKen Solving" (hUnitTestToTests kenken_solving_tests)
         ]
 
+sudoku_gen_tests :: HU.Test
+sudoku_gen_tests = HU.TestList [sudoku_gen_easiest]
+
+sudoku_gen_easiest :: HU.Test
+sudoku_gen_easiest = let (sol, s) = genSudoku (mkStdGen 0) Easiest
+                         solved = sudoku s
+                     in HU.TestCase (HU.assertEqual "sudoku gen easiest"
+                                                    sol
+                                                    solved)
+
+kenken_gen_tests :: HU.Test
+kenken_gen_tests = HU.TestList [kenken_gen_easiest, kenken_gen_evil]
+
+kenken_gen_easiest :: HU.Test
+kenken_gen_easiest = let (sol, s) = genKenKen (mkStdGen 0) Easiest
+                         solved = kenken s
+                         in HU.TestCase (HU.assertEqual "kenken gen easiest"
+                                                        sol
+                                                        solved)
+
+kenken_gen_evil :: HU.Test
+kenken_gen_evil = let (sol, s) = genKenKen (mkStdGen 0) Evil
+                         solved = kenken s
+                         in HU.TestCase (HU.assertEqual "kenken gen evil"
+                                                        sol
+                                                        solved)
+
+                                                  
 sudoku_solving_tests :: HU.Test
 sudoku_solving_tests = HU.TestList [sudoku_easy]
 
