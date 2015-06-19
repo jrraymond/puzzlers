@@ -10,15 +10,16 @@ import System.Random
 
 main :: IO ()
 main = do let sol = sudoku sudokuPuzzle
-          print sol
+          --print sol
           let eq = sol == Just sudokuSolution
           let sol2 = sudoku sudokuSolution
-          print sol2
+          --print sol2
           let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
-          print gen_sudoku
-          print sol3
+          --print gen_sudoku
+          --print sol3
           let kenkensol = kenken (4, kenkenPuzzle)
           let kenkeneq = kenkensol == Just  kenkenSolution
+          print kenkensol
           print kenkeneq
           if not eq || not kenkeneq
             then exitFailure

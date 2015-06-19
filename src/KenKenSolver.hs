@@ -1,10 +1,11 @@
 module KenKenSolver where
 
 import System.Random
-import Data.List (sortBy, tails, elemIndex, permutations)
+import Data.List (sortBy, tails, elemIndex, permutations, nub)
 import Data.Ord (comparing)
 import Data.Maybe (mapMaybe, fromJust, isJust)
 import LatinSquare
+import Debug.Trace
 
 
 type Grid = [[Int]]
@@ -19,31 +20,37 @@ kenken :: (Int, [([Int] -> Int, Int, [(Int,Int)])]) -> Maybe [[Int]]
 kenken (dim, cs0) = go cs0'' empty empty zeroes where
   empty = replicate dim []
   zeroes = replicate dim $ replicate dim 0
-  cs0' = sortOn (\(_,_,is) -> is) cs0
+  cs0' = sortOn (\(_,_,is) -> length is) cs0
   cs0'' = map (\(op, s, is) -> let (rixs, cixs) = unzip is
                                in (op, s, rixs, cixs)) cs0'
 
   combsMemo :: Int -> [[Int]]
   combsMemo = ((map combs [0 .. dim]) !!)
+
   combs :: Int -> [[Int]]
-  combs n 
-    | n < 3 = concatMap permutations $ combinations n [1 .. dim]
-    | otherwise = concatMap permutations $ combsWithRep n [1 .. dim]
+  combs n = let f | n < 3 = combinations | otherwise = combsWithRep
+            in concatMap permutations $ f n [1 .. dim]
 
   go :: [([Int] -> Int, Int, [Int], [Int])] -> [[Int]] -> [[Int]] 
         -> [[Int]] -> Maybe [[Int]]
-  go [] _ _ sq = Just sq
+  go [] _ _ sq = trace ("!!!!!!!!\n" ++ show sq) $ Just sq
   go ((op, a, rixs, cixs):cs) rcs ccs sq
+    | trace (replicate 40 '-' ++ show (length cs)) False = undefined
     | length paths /= 1 = Nothing
     | otherwise = Just $ head paths
-    where opts = filter (\ns -> a == op ns) (combsMemo (length rixs))
-          paths = mapMaybe try opts
+    where debug = show a ++ "\t" ++ show (zip rixs cixs) ++ "\n" ++ show sq
+          opts = trace debug $ nub $ concatMap permutations $
+                          filter (\ns -> a == op ns) 
+                                 (combsMemo (length rixs))
+          paths = trace ("opts: " ++ show opts) $ mapMaybe try opts
+          --paths = mapMaybe try opts
           try :: [Int] -> Maybe [[Int]]
           try [] = Nothing
           try xs 
-            | not (ok xs rixs cixs rcs ccs)
-              || dups xs rixs cixs = Nothing
-            | otherwise = go cs rcs' ccs' sq'
+            | trace ("try: " ++ show xs ++ "\trcs: " ++ show rcs ++ "\tccs: " ++ show ccs) False = undefined
+            | not (ok xs rixs cixs rcs ccs) = trace ("not ok") Nothing
+            | dups xs rixs cixs = trace ("dups") Nothing
+            | otherwise = trace ("go: " ++ show (length cs)) $ go cs rcs' ccs' sq'
             where 
               rcs' = addConstraints xs rixs rcs
               ccs' = addConstraints xs cixs ccs
@@ -54,7 +61,7 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
 dups :: [Int] -> [Int] -> [Int] -> Bool
 dups [] rixs cixs = False
 dups (x:xs) (r:rixs) (c:cixs)
-  | isJust ixM && rixs !! ix == r || cixs !! ix == c = True
+  | isJust ixM && (rixs !! ix == r || cixs !! ix == c) = True
   | otherwise = dups xs rixs cixs
   where ixM = elemIndex x xs
         ix = fromJust ixM
