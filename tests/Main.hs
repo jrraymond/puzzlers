@@ -4,27 +4,44 @@ import SudokuSolver
 import SudokuGenerator
 import KenKenGenerator
 import KenKenSolver
-import LatinSquare
-import System.Exit (exitFailure, exitSuccess)
-import System.Random
+import Test.Framework (defaultMain, testGroup, Test)
+--import Test.Framework
+import Test.Framework.Providers.HUnit
+import qualified Test.HUnit as HU
 
 main :: IO ()
-main = do let sol = sudoku sEasy
-          --print sol
-          let eq = sol == Just sEasySol
-          let sol2 = sudoku sEasySol
-          --print sol2 let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
-          --print gen_sudoku
-          --print sol3
-          let kenkensol = kenken (length kkEasySol, kkEasy)
-          let kenkeneq = kenkensol == Just  kkEasySol
-          let kenkensolH = kenken (length kkHardSol, kkHard)
-          let kenkeneqH = kenkensolH == Just kkHardSol
-          print kenkensol
-          print kenkeneq
-          if not eq || not kenkeneq || not kenkeneqH
-            then exitFailure
-            else exitSuccess
+main = defaultMain tests
+
+tests :: [Test]
+tests = [ testGroup "Sudoku Solving" (hUnitTestToTests (sudoku_solving_tests))
+        , testGroup "KenKen Solving" (hUnitTestToTests (kenken_solving_tests))
+        ]
+
+sudoku_solving_tests :: HU.Test
+sudoku_solving_tests = HU.TestList [sudoku_easy]
+
+sudoku_easy :: HU.Test
+sudoku_easy = HU.TestCase (HU.assertEqual "sudoku easy" 
+                                          (Just sEasySol) 
+                                          (sudoku sEasy))
+
+kenken_solving_tests :: HU.Test
+kenken_solving_tests = HU.TestList [kenken_easy, kenken_hard]
+
+kenken_easy :: HU.Test
+kenken_easy = HU.TestCase (HU.assertEqual "kenken easy"
+                                          (Just kkEasySol)
+                                          (kenken (length kkEasySol,kkEasy)))
+
+kenken_hard :: HU.Test
+kenken_hard = HU.TestCase (HU.assertEqual "kenken hard"
+                                          (Just kkHardSol)
+                                          (kenken (length kkHardSol, kkHard)))
+
+
+
+--          --print sol2 let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
+--          --print gen_sudoku
 
 sEasy :: [[Int]]
 sEasy = [[5,3,0,0,7,0,0,0,0],

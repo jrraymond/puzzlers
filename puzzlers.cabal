@@ -23,8 +23,11 @@ test-suite tests
   Main-Is:           Main.hs
   GHC-Options:       -Wall -rtsopts -O2
   build-depends:     base >=4.7 && <4.8
-                   , puzzlers
+                   , test-framework
+                   , test-framework-hunit
+                   , HUnit
                    , random
+                   , puzzlers
 
 library
   exposed-modules:   SudokuSolver
@@ -35,8 +38,8 @@ library
   -- other-modules:       
   -- other-extensions:    
   build-depends:     base >=4.7 && <4.8
-                     , random
-                     , random-shuffle
+                   , random
+                   , random-shuffle
 
   hs-source-dirs:    src
   default-language:  Haskell2010

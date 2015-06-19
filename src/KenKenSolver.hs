@@ -4,7 +4,6 @@ import Data.List (sortBy, tails, elemIndex, permutations, nub)
 import Data.Ord (comparing)
 import Data.Maybe (mapMaybe, fromJust, isJust)
 import LatinSquare
-import Debug.Trace
 
 
 type Grid = [[Int]]
@@ -36,11 +35,10 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
   go ((op, a, rixs, cixs):cs) rcs ccs sq
     | length paths /= 1 = Nothing
     | otherwise = Just $ head paths
-    where debug = "a: " ++ show a ++ "\n" ++ show sq
-          opts = nub $ concatMap permutations $
+    where opts = nub $ concatMap permutations $
                                  filter (\ns -> a == op ns) 
                                         (combsMemo (length rixs))
-          paths = trace (replicate 20 '_' ++ "\n" ++ debug) $ mapMaybe try opts
+          paths = mapMaybe try opts
           try :: [Int] -> Maybe [[Int]]
           try [] = Nothing
           try xs 
