@@ -23,7 +23,7 @@ eraseGivens g0 n0 s0
         go :: RandomGen g => g -> Int -> [(Int, Int)] -> Sudoku -> Maybe Sudoku
         go _ 0 _ s = Just s
         go g n is s 
-          | isNothing (sudoku s) || null paths = Nothing
+          | null paths = Nothing
           | otherwise = Just $ head paths
           where
             xs = shuffle' [0 .. length is - 1] (length is) g
@@ -31,7 +31,9 @@ eraseGivens g0 n0 s0
             paths = mapMaybe (\ix -> let is' = take ix is ++ drop (ix + 1) is
                                          (r, c) = is !! ix
                                          s' = modCell (const 0) r c s
-                                     in go g' (n - 1) is' s')
+                                     in if isNothing (sudoku s')
+                                          then Nothing
+                                          else go g' (n - 1) is' s')
                              xs
 
 numHoles :: RandomGen g => g -> Difficulty -> (Int, g)

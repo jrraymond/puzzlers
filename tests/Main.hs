@@ -22,14 +22,31 @@ tests = [ testGroup "Sudoku Generating" (hUnitTestToTests sudoku_gen_tests)
         ]
 
 sudoku_gen_tests :: HU.Test
-sudoku_gen_tests = HU.TestList [sudoku_gen_easiest]
+sudoku_gen_tests = HU.TestList [sudoku_gen_easiest, sudoku_gen_easy, sudoku_gen_moderate, sudoku_gen_hard]
 
 sudoku_gen_easiest :: HU.Test
 sudoku_gen_easiest = let (sol, s) = genSudoku (mkStdGen 0) Easiest
-                         solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
-                     in HU.TestCase (HU.assertEqual "sudoku gen easiest"
-                                                    (Just sol)
-                                                    solved)
+                         --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
+                         solved = sudoku s
+                     in HU.TestCase (HU.assertEqual "easiest" (Just sol) solved)
+
+
+sudoku_gen_easy :: HU.Test
+sudoku_gen_easy = let (sol, s) = genSudoku (mkStdGen 0) Easy
+                      --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
+                      solved = sudoku s
+                  in HU.TestCase (HU.assertEqual "easy" (Just sol) solved)
+
+sudoku_gen_moderate :: HU.Test
+sudoku_gen_moderate = let (sol, s) = genSudoku (mkStdGen 0) Moderate
+                          --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
+                          solved = sudoku s
+                      in HU.TestCase (HU.assertEqual "moderate" (Just sol) solved)
+
+sudoku_gen_hard :: HU.Test
+sudoku_gen_hard = let (sol, s) = genSudoku (mkStdGen 0) Hard
+                      solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
+                  in HU.TestCase (HU.assertEqual "hard" (Just sol) solved)
 
 kenken_gen_tests :: HU.Test
 kenken_gen_tests = HU.TestList [kenken_gen_easiest, kenken_gen_evil]
