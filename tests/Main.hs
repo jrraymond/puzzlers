@@ -1,10 +1,12 @@
 module Main (main) where
 
 import System.Random
+import LatinSquare
 import SudokuSolver
 import SudokuGenerator
 import KenKenGenerator
 import KenKenSolver
+import Debug.Trace
 import Test.Framework (defaultMain, testGroup, Test)
 import Test.Framework.Providers.HUnit
 import qualified Test.HUnit as HU
@@ -24,27 +26,27 @@ sudoku_gen_tests = HU.TestList [sudoku_gen_easiest]
 
 sudoku_gen_easiest :: HU.Test
 sudoku_gen_easiest = let (sol, s) = genSudoku (mkStdGen 0) Easiest
-                         solved = sudoku s
+                         solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
                      in HU.TestCase (HU.assertEqual "sudoku gen easiest"
-                                                    sol
+                                                    (Just sol)
                                                     solved)
 
 kenken_gen_tests :: HU.Test
 kenken_gen_tests = HU.TestList [kenken_gen_easiest, kenken_gen_evil]
 
 kenken_gen_easiest :: HU.Test
-kenken_gen_easiest = let (sol, s) = genKenKen (mkStdGen 0) Easiest
-                         solved = kenken s
+kenken_gen_easiest = let (sol, s) = genKenKen (mkStdGen 0) Easiest 4
+                         solved = kenken (4,s)
                          in HU.TestCase (HU.assertEqual "kenken gen easiest"
-                                                        sol
+                                                        (Just sol)
                                                         solved)
 
 kenken_gen_evil :: HU.Test
-kenken_gen_evil = let (sol, s) = genKenKen (mkStdGen 0) Evil
-                         solved = kenken s
-                         in HU.TestCase (HU.assertEqual "kenken gen evil"
-                                                        sol
-                                                        solved)
+kenken_gen_evil = let (sol, s) = genKenKen (mkStdGen 0) Evil 4
+                      solved = kenken (4,s)
+                  in HU.TestCase (HU.assertEqual "kenken gen evil"
+                                                 (Just sol)
+                                                 solved)
 
                                                   
 sudoku_solving_tests :: HU.Test
@@ -95,16 +97,16 @@ sEasySol = [[5,3,4,6,7,8,9,1,2],
             [2,8,7,4,1,9,6,3,5],
             [3,4,5,2,8,6,1,7,9]]
 
-kkEasy :: [([Int] -> Int, Int, [(Int,Int)])]
-kkEasy = [ (divide  , 2, [(0,0),(1,0)])
-         , (plus    , 3, [(0,1)])
-         , (minus   , 3, [(0,2),(0,3)])
-         , (divide  , 2, [(1,1),(2,1)])
-         , (plus    , 7, [(1,2),(2,2)])
-         , (plus    , 1, [(1,3)])
-         , (minus   , 2, [(2,0),(3,0)])
-         , (divide  , 2, [(3,1),(3,2)])
-         , (multiply, 6, [(2,3),(3,3)]) ]
+kkEasy :: [(Op, Int, [(Int,Int)])]
+kkEasy = [ (Divide  , 2, [(0,0),(1,0)])
+         , (Plus    , 3, [(0,1)])
+         , (Minus   , 3, [(0,2),(0,3)])
+         , (Divide  , 2, [(1,1),(2,1)])
+         , (Plus    , 7, [(1,2),(2,2)])
+         , (Plus    , 1, [(1,3)])
+         , (Minus   , 2, [(2,0),(3,0)])
+         , (Divide  , 2, [(3,1),(3,2)])
+         , (Multiply, 6, [(2,3),(3,3)]) ]
 
 kkEasySol :: [[Int]]
 kkEasySol = [[2,3,1,4]
@@ -112,23 +114,23 @@ kkEasySol = [[2,3,1,4]
             ,[3,1,4,2]
             ,[1,4,2,3]]
 
-kkHard :: [([Int] -> Int, Int, [(Int,Int)])]
-kkHard = [ (minus   ,  1, [(0,0),(1,0)])
-         , (divide  ,  3, [(0,1),(1,1)])
-         , (multiply, 10, [(0,2),(0,3)])
-         , (plus    , 11, [(0,4),(0,5),(1,4)])
-         , (plus    , 12, [(1,2),(1,3),(2,2)])
-         , (minus   ,  1, [(2,0),(3,0)])
-         , (minus   ,  1, [(2,1),(3,1)])
-         , (minus   ,  3, [(2,3),(2,4)])
-         , (plus    , 14, [(1,5),(2,5),(3,5),(4,5)])
-         , (multiply,  6, [(4,0),(4,1)])
-         , (plus    , 10, [(3,2),(4,2)])
-         , (plus    ,  7, [(3,3),(3,4),(4,4)])
-         , (plus    ,  3, [(4,3)])
-         , (minus   ,  2, [(5,0),(5,1)])
-         , (minus   ,  5, [(5,2),(5,3)])
-         , (multiply, 15, [(5,4),(5,5)]) ]
+kkHard :: [(Op, Int, [(Int,Int)])]
+kkHard = [ (Minus   ,  1, [(0,0),(1,0)])
+         , (Divide  ,  3, [(0,1),(1,1)])
+         , (Multiply, 10, [(0,2),(0,3)])
+         , (Plus    , 11, [(0,4),(0,5),(1,4)])
+         , (Plus    , 12, [(1,2),(1,3),(2,2)])
+         , (Minus   ,  1, [(2,0),(3,0)])
+         , (Minus   ,  1, [(2,1),(3,1)])
+         , (Minus   ,  3, [(2,3),(2,4)])
+         , (Plus    , 14, [(1,5),(2,5),(3,5),(4,5)])
+         , (Multiply,  6, [(4,0),(4,1)])
+         , (Plus    , 10, [(3,2),(4,2)])
+         , (Plus    ,  7, [(3,3),(3,4),(4,4)])
+         , (Plus    ,  3, [(4,3)])
+         , (Minus   ,  2, [(5,0),(5,1)])
+         , (Minus   ,  5, [(5,2),(5,3)])
+         , (Multiply, 15, [(5,4),(5,5)]) ]
 
 kkHardSol :: [[Int]]
 kkHardSol = [[3,1,2,5,6,4]

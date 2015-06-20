@@ -3,9 +3,10 @@ module KenKenGenerator where
 import LatinSquare
 import System.Random
 import Data.List (foldl1', mapAccumL)
-import Debug.Trace
 
-genKenKen :: RandomGen g => g -> Difficulty -> Int -> ([[Int]], [([Int] -> Int, Int, [(Int,Int)])])
+data Op = Plus | Minus | Multiply | Divide deriving (Show, Eq, Read)
+
+genKenKen :: RandomGen g => g -> Difficulty -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
 genKenKen g diff dim = let sq = genLatinSquare g dim
                            cages = genCages g diff dim sq 
                            ops = genOps g diff sq cages
@@ -44,10 +45,10 @@ getAdjIxs :: Int -> (Int,Int) -> [(Int,Int)]
 getAdjIxs dim (r,c) = filter (\(ri,ci) -> ri >= 0 && ri < dim && ci >= 0 && ci < dim)
                              [(r - 1,c),(r,c - 1),(r + 1,c),(r,c + 1)]
 
-genOps :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> [([Int] -> Int, Int, [(Int,Int)])]
+genOps :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
 genOps _ _ _ [] = []
 genOps g0 diff sq (cs:css) = let (f, g1) = randomElem g0 operations
-                                 s = f [ sq !! r !! c | (r,c) <- cs] 
+                                 s = eval f [ sq !! r !! c | (r,c) <- cs] 
                              in (f, s, cs) : genOps g1 diff sq css
 
 getCageDist :: Difficulty -> [Int]
@@ -58,19 +59,15 @@ getCageDist d = case d of
                   Hard     -> [2, 2, 3, 3, 4]
                   Evil     -> [2, 2, 3, 4, 4]
 
-plus :: [Int] -> Int
-plus = foldl1' (+)
+eval :: Op -> [Int] -> Int
+eval op = case op of
+            Plus     -> foldl1' (+)
+            Minus    -> foldl1' (-)
+            Multiply -> foldl1' (*)
+            Divide   -> foldl1' (div)
 
-minus :: [Int] -> Int
-minus = foldl1' (-)
 
-multiply :: [Int] -> Int
-multiply = foldl1' (*)
-
-divide :: [Int] -> Int
-divide = foldl1' div
-
-operations :: [([Int] -> Int)]
-operations = [plus, minus, multiply, divide]
+operations :: [Op]
+operations = [Plus, Minus, Multiply, Divide]
 
 

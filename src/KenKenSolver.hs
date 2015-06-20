@@ -4,17 +4,12 @@ import Data.List (sortBy, tails, elemIndex, permutations, nub)
 import Data.Ord (comparing)
 import Data.Maybe (mapMaybe, fromJust, isJust)
 import LatinSquare
+import KenKenGenerator
 
 
-type Grid = [[Int]]
-type Row = [Int]
-type Constraints = Grid
-type Op = [Int] -> Int
-type Cage = (Int, Op, [(Int,Int)])
-type KenKen = (Grid, [Cage])
 
 
-kenken :: (Int, [([Int] -> Int, Int, [(Int,Int)])]) -> Maybe [[Int]]
+kenken :: (Int, [(Op, Int, [(Int,Int)])]) -> Maybe [[Int]]
 kenken (dim, cs0) = go cs0'' empty empty zeroes where
   empty = replicate dim []
   zeroes = replicate dim $ replicate dim 0
@@ -29,14 +24,14 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
   combs n = let f | n < 3 = combinations | otherwise = combsWithRep
             in concatMap permutations $ f n [1 .. dim]
 
-  go :: [([Int] -> Int, Int, [Int], [Int])] -> [[Int]] -> [[Int]] 
+  go :: [(Op, Int, [Int], [Int])] -> [[Int]] -> [[Int]] 
         -> [[Int]] -> Maybe [[Int]]
   go [] _ _ sq = Just sq
   go ((op, a, rixs, cixs):cs) rcs ccs sq
     | length paths /= 1 = Nothing
     | otherwise = Just $ head paths
     where opts = nub $ concatMap permutations $
-                                 filter (\ns -> a == op ns) 
+                                 filter (\ns -> a == eval op ns) 
                                         (combsMemo (length rixs))
           paths = mapMaybe try opts
           try :: [Int] -> Maybe [[Int]]
