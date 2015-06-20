@@ -1,7 +1,7 @@
 module SudokuGenerator where
 
 import System.Random
-import Shuffle
+import System.Random.Shuffle
 import SudokuSolver
 import LatinSquare
 import Data.Maybe (isNothing, mapMaybe, fromJust)
