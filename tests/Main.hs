@@ -6,7 +6,6 @@ import SudokuSolver
 import SudokuGenerator
 import KenKenGenerator
 import KenKenSolver
-import Debug.Trace
 import Test.Framework (defaultMain, testGroup, Test)
 import Test.Framework.Providers.HUnit
 import qualified Test.HUnit as HU
@@ -21,49 +20,26 @@ tests = [ testGroup "Sudoku Generating" (hUnitTestToTests sudoku_gen_tests)
         , testGroup "KenKen Solving" (hUnitTestToTests kenken_solving_tests)
         ]
 
+difficulties :: [Difficulty]
+difficulties = [Easiest, Easy, Moderate, Hard, Evil]
+
 sudoku_gen_tests :: HU.Test
-sudoku_gen_tests = HU.TestList [sudoku_gen_easiest, sudoku_gen_easy, sudoku_gen_moderate, sudoku_gen_hard]
-
-sudoku_gen_easiest :: HU.Test
-sudoku_gen_easiest = let (sol, s) = genSudoku (mkStdGen 0) Easiest
-                         --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
-                         solved = sudoku s
-                     in HU.TestCase (HU.assertEqual "easiest" (Just sol) solved)
-
-
-sudoku_gen_easy :: HU.Test
-sudoku_gen_easy = let (sol, s) = genSudoku (mkStdGen 0) Easy
-                      --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
-                      solved = sudoku s
-                  in HU.TestCase (HU.assertEqual "easy" (Just sol) solved)
-
-sudoku_gen_moderate :: HU.Test
-sudoku_gen_moderate = let (sol, s) = genSudoku (mkStdGen 0) Moderate
-                          --solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
-                          solved = sudoku s
-                      in HU.TestCase (HU.assertEqual "moderate" (Just sol) solved)
-
-sudoku_gen_hard :: HU.Test
-sudoku_gen_hard = let (sol, s) = genSudoku (mkStdGen 0) Hard
-                      solved = trace (show sol ++ "\n\n" ++ show s) $ sudoku s
-                  in HU.TestCase (HU.assertEqual "hard" (Just sol) solved)
+sudoku_gen_tests = HU.TestList $ map sudoku_gen difficulties
 
 kenken_gen_tests :: HU.Test
-kenken_gen_tests = HU.TestList [kenken_gen_easiest, kenken_gen_evil]
+kenken_gen_tests = HU.TestList $ map (kenken_gen 4) difficulties
 
-kenken_gen_easiest :: HU.Test
-kenken_gen_easiest = let (sol, s) = genKenKen (mkStdGen 0) Easiest 4
-                         solved = kenken (4,s)
-                         in HU.TestCase (HU.assertEqual "kenken gen easiest"
-                                                        (Just sol)
-                                                        solved)
 
-kenken_gen_evil :: HU.Test
-kenken_gen_evil = let (sol, s) = genKenKen (mkStdGen 0) Evil 4
-                      solved = kenken (4,s)
-                  in HU.TestCase (HU.assertEqual "kenken gen evil"
-                                                 (Just sol)
-                                                 solved)
+sudoku_gen :: Difficulty -> HU.Test
+sudoku_gen d = let (sol, s) = genSudoku (mkStdGen 0) d
+                   solved = sudoku s
+               in HU.TestCase (HU.assertEqual (show d) (Just sol) solved)
+
+
+kenken_gen :: Int -> Difficulty -> HU.Test
+kenken_gen n d = let (sol, s) = genKenKen (mkStdGen 0) d n
+                     solved = kenken (n,s)
+                 in HU.TestCase (HU.assertEqual (show d) (Just sol) solved)
 
                                                   
 sudoku_solving_tests :: HU.Test
@@ -89,8 +65,6 @@ kenken_hard = HU.TestCase (HU.assertEqual "kenken hard"
 
 
 
---          --print sol2 let (sol3, gen_sudoku) = genSudoku (mkStdGen 0) Easiest
---          --print gen_sudoku
 
 sEasy :: [[Int]]
 sEasy = [[5,3,0,0,7,0,0,0,0],

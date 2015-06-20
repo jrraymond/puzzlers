@@ -42,7 +42,6 @@ benchmark benchmarks
   build-Depends:     base >=4.7 && <4.8
                    , criterion
                    , random
-
                    , puzzlers
 
 test-suite tests

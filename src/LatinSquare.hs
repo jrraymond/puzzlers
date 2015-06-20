@@ -3,7 +3,7 @@ module LatinSquare where
 import System.Random
 import Data.Maybe (fromJust, mapMaybe)
 
-data Difficulty = Easiest | Easy | Moderate | Hard | Evil
+data Difficulty = Easiest | Easy | Moderate | Hard | Evil deriving (Show, Read, Eq)
 
 genLatinSquare :: RandomGen g => g -> Int -> (Int -> Int -> [[Int]] -> Int -> Bool) -> [[Int]]
 genLatinSquare gen dim rules = fromJust $ go gen 0 0 zeroes
