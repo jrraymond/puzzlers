@@ -49,5 +49,3 @@ boxes s0 = go 0 0 (replicate 9 []) where
                in go r (c + 1) bcs'
 
 
-getBoxI :: Int -> Int -> Int
-getBoxI r c = 3 * (r `div` 3) + (c `div` 3)

@@ -5,26 +5,35 @@ import Data.Maybe (fromJust, mapMaybe)
 
 data Difficulty = Easiest | Easy | Moderate | Hard | Evil
 
-genLatinSquare :: RandomGen g => g -> Int -> [[Int]]
-genLatinSquare gen dim = fromJust $ go gen 0 0 empty empty zeroes
-  where empty = replicate dim []
-        zeroes = replicate dim $ replicate dim 0
-        go :: RandomGen g => g -> Int -> Int 
-             -> [[Int]] -> [[Int]] -> [[Int]] -> Maybe [[Int]]
-        go g ri ci rcs ccs sq
+genLatinSquare :: RandomGen g => g -> Int -> (Int -> Int -> [[Int]] -> Int -> Bool) -> [[Int]]
+genLatinSquare gen dim rules = fromJust $ go gen 0 0 zeroes
+  where zeroes = replicate dim $ replicate dim 0
+        go :: RandomGen g => g -> Int -> Int -> [[Int]] -> Maybe [[Int]]
+        go g ri ci sq
           | ri == dim = Just sq
-          | ci == dim = go g (ri + 1) 0 rcs ccs sq
+          | ci == dim = go g (ri + 1) 0 sq
           | null paths = Nothing
           | otherwise = Just s
-          where options = [ i | i <- [1..dim]
-                              , notElem i (rcs !! ri) 
-                                && notElem i (ccs !! ci) ]
+          where ok :: Int -> Bool
+                ok = rules ri ci sq
+                options = filter ok [1 .. dim]
                 (s, g') = randomElem g paths
-                paths = mapMaybe (\x -> let rcs' = addConstraint x ri rcs
-                                            ccs' = addConstraint x ci ccs
-                                            sq' = modCell (const x) ri ci sq
-                                        in go g' ri (ci + 1) rcs' ccs' sq')
+                paths = mapMaybe (\x -> let sq' = modCell (const x) ri ci sq
+                                        in go g' ri (ci + 1) sq')
                                   options
+
+
+latinSqRules :: Int -> Int -> [[Int]] -> Int -> Bool
+latinSqRules r c sq x = notElem x (sq !! r) && notElem x (map (!! c) sq)
+
+sudokuRules  :: Int -> Int -> [[Int]] -> Int -> Bool
+sudokuRules r c sq x = let bi = getBoxI r c
+                           d = length sq
+                           box = [ sq !! ri !! ci | ri <- [0 .. d - 1]
+                                                  , ci <- [0 .. d - 1]
+                                                  , bi == getBoxI ri ci ]
+                       in notElem x box && latinSqRules r c sq x
+
 
 addConstraint :: Int -> Int -> [[Int]] -> [[Int]]
 addConstraint x i xss = take i xss ++ [x : (xss !! i)] ++ drop (i + 1) xss
@@ -46,3 +55,6 @@ randomElem g xs = let (ix, g') = randomR (0, length xs - 1) g
 
 stepG :: RandomGen g => g -> g
 stepG g = let (_, g') = next g in g'
+
+getBoxI :: Int -> Int -> Int
+getBoxI r c = 3 * (r `div` 3) + (c `div` 3)

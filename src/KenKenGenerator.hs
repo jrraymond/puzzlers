@@ -7,7 +7,7 @@ import Data.List (foldl1', mapAccumL)
 data Op = Plus | Minus | Multiply | Divide deriving (Show, Eq, Read)
 
 genKenKen :: RandomGen g => g -> Difficulty -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
-genKenKen g diff dim = let sq = genLatinSquare g dim
+genKenKen g diff dim = let sq = genLatinSquare g dim latinSqRules
                            cages = genCages g diff dim sq 
                            ops = genOps g diff sq cages
                        in (sq, ops)
@@ -64,7 +64,7 @@ eval op = case op of
             Plus     -> foldl1' (+)
             Minus    -> foldl1' (-)
             Multiply -> foldl1' (*)
-            Divide   -> foldl1' (div)
+            Divide   -> foldl1' div
 
 
 operations :: [Op]

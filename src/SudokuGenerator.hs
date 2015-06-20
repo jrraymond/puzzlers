@@ -8,7 +8,7 @@ import Data.Maybe (isNothing, mapMaybe, fromJust)
 
 
 genSudoku :: RandomGen g => g -> Difficulty -> (Sudoku, Sudoku)
-genSudoku g d = let sq = genLatinSquare g 9
+genSudoku g d = let sq = genLatinSquare g 9 sudokuRules
                     (n, g') = numHoles g d
                 in (sq, eraseGivens g' n sq)
 
