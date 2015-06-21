@@ -1,4 +1,5 @@
 module SudokuSolver where
+
 import Data.Maybe
 import LatinSquare
 
@@ -19,7 +20,7 @@ sudoku s0 = go s0 rcs0 ccs0 bcs0 0 0 where
   go s rcs ccs bcs r 9 = go s rcs ccs bcs (r + 1) 0
   go s rcs ccs bcs r c
     | cell /= 0 = go s rcs ccs bcs r (c + 1)
-    | length paths /= 1 = Nothing
+    | null paths = Nothing
     | otherwise = Just $ head paths
     where cell = s0 !! r !! c
           bIx = getBoxI r c
@@ -47,5 +48,4 @@ boxes s0 = go 0 0 (replicate 9 []) where
   go r c bcs = let v = s0 !! r !! c
                    bcs' = addConstraint v (getBoxI r  c) bcs
                in go r (c + 1) bcs'
-
 

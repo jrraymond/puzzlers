@@ -2,6 +2,7 @@ module LatinSquare where
 
 import System.Random
 import Data.Maybe (fromJust, mapMaybe)
+import Data.List (intercalate)
 
 data Difficulty = Easiest | Easy | Moderate | Hard | Evil deriving (Show, Read, Eq)
 
@@ -53,8 +54,11 @@ randomElem :: RandomGen g => g -> [a] -> (a, g)
 randomElem g xs = let (ix, g') = randomR (0, length xs - 1) g
                   in (xs !! ix, g')
 
-stepG :: RandomGen g => g -> g
-stepG g = let (_, g') = next g in g'
-
 getBoxI :: Int -> Int -> Int
 getBoxI r c = 3 * (r `div` 3) + (c `div` 3)
+
+stepG :: RandomGen g => g -> g
+stepG = snd . next
+
+showGrid :: Show a => [[a]] -> String
+showGrid = intercalate "\n" . map show
