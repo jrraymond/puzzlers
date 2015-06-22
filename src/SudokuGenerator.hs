@@ -5,6 +5,7 @@ import System.Random.Shuffle
 import SudokuSolver
 import LatinSquare
 import Data.Maybe (isNothing, mapMaybe, fromJust)
+import Data.Either (isLeft)
 
 
 genSudoku :: RandomGen g => g -> Difficulty -> ([[Int]], [[Int]])
@@ -30,8 +31,7 @@ eraseGivens g0 n0 s0
             paths = mapMaybe (\ix -> let is' = take ix is ++ drop (ix + 1) is
                                          (r, c) = is !! ix
                                          s' = modCell (const 0) r c s
-                                         solved = sudoku s'
-                                     in if solved /= Just s0
+                                     in if isLeft (sudoku s')
                                           then Nothing
                                           else go (snd $ next g) (n - 1) is' s')
                              ixs

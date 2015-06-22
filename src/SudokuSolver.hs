@@ -1,6 +1,6 @@
 module SudokuSolver where
 
-import Data.Maybe
+import Data.Either
 import LatinSquare
 
 type Sudoku = [[Int]]
@@ -9,31 +9,33 @@ type Row = [(Int,Int,Int)]
 type Col = Row
 type Box = Col
 
-sudoku :: [[Int]] -> Maybe [[Int]]
+sudoku :: [[Int]] -> Either Bool [[Int]]
 sudoku s0 = go s0 rcs0 ccs0 bcs0 0 0 where
   rcs0 = map (filter (/= 0)) s0
   ccs0 = map (filter (/= 0)) (columns s0)
   bcs0 = map (filter (/= 0)) (boxes s0)
   go :: [[Int]] -> [[Int]] -> [[Int]] -> [[Int]]
-         -> Int -> Int -> Maybe [[Int]]
-  go s _ _ _ 9 _ = Just s
+         -> Int -> Int -> Either Bool [[Int]]
+  go s _ _ _ 9 _ = Right s
   go s rcs ccs bcs r 9 = go s rcs ccs bcs (r + 1) 0
   go s rcs ccs bcs r c
     | cell /= 0 = go s rcs ccs bcs r (c + 1)
-    | null paths = Nothing
-    | otherwise = Just $ head paths
+    | or ls || length rs > 1 = Left True
+    | null rs = Left False
+    | otherwise = Right $ head rs
     where cell = s0 !! r !! c
           bIx = getBoxI r c
+          (ls, rs) = partitionEithers paths
           options = [ x | x <- [1 .. 9]
                         , notElem x (rcs !! r) && 
                           notElem x (ccs !! c) &&
                           notElem x (bcs !! bIx) ]
-          paths = mapMaybe (\x -> let rcs' = addConstraint x r rcs
-                                      ccs' = addConstraint x c ccs
-                                      bcs' = addConstraint x bIx bcs
-                                      s' = modCell (const x) r c s
-                                  in go s' rcs' ccs' bcs' r (c + 1))
-                            options
+          paths = map (\x -> let rcs' = addConstraint x r rcs
+                                 ccs' = addConstraint x c ccs
+                                 bcs' = addConstraint x bIx bcs
+                                 s' = modCell (const x) r c s
+                             in go s' rcs' ccs' bcs' r (c + 1))
+                      options
 
 columns :: [[Int]] -> [[Int]]
 columns s0 = go 0 0 (replicate 9 []) where

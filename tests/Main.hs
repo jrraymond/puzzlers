@@ -33,7 +33,7 @@ kenken_gen_tests = HU.TestList $ map (kenken_gen 4) difficulties
 sudoku_gen :: Difficulty -> HU.Test
 sudoku_gen d = let (sol, s) = genSudoku (mkStdGen 0) d
                    solved = sudoku s
-               in HU.TestCase (HU.assertEqual (show d) (Just sol) solved)
+               in HU.TestCase (HU.assertEqual (show d) (Right sol) solved)
 
 
 kenken_gen :: Int -> Difficulty -> HU.Test
@@ -47,7 +47,7 @@ sudoku_solving_tests = HU.TestList [sudoku_easy]
 
 sudoku_easy :: HU.Test
 sudoku_easy = HU.TestCase (HU.assertEqual "sudoku easy" 
-                                          (Just sEasySol) 
+                                          (Right sEasySol) 
                                           (sudoku sEasy))
 
 kenken_solving_tests :: HU.Test
