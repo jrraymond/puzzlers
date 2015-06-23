@@ -1,10 +1,9 @@
 module KenKenSolver where
 
-import Data.List (tails, elemIndex, permutations, nub)
+import Data.List (elemIndex, permutations, nub)
 import Data.Either
 import Data.Maybe (fromJust, isJust)
 import LatinSquare
-import KenKenGenerator
 
 
 
@@ -80,15 +79,3 @@ ok xs rixs cixs rcs ccs = all (== True) $
                                map (\(x,r,c) -> notElem x (rcs !! r)
                                                && notElem x (ccs !! c))
                                    (zip3 xs rixs cixs)
-
-combinations :: Int -> [a] -> [[a]]
-combinations 0 _  = [ [] ]
-combinations n xs = [ y:ys | y:xs' <- tails xs , ys <- combinations (n-1) xs']
-
-
-combsWithRep :: Int -> [a] -> [[a]]
-combsWithRep k xs = combsBySize xs !! k
- where combsBySize = foldr f ([[]] : repeat [])
-       f :: a -> [[[a]]] -> [[[a]]]
-       f x = scanl1 (\z n -> map (x:) z ++ n)
-

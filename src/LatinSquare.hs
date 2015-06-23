@@ -2,10 +2,11 @@ module LatinSquare where
 
 import System.Random
 import Data.Maybe (fromJust, mapMaybe)
-import Data.List (intercalate, sortBy)
+import Data.List (foldl1', tails, intercalate, sortBy)
 import Data.Ord (comparing)
 
 data Difficulty = Easiest | Easy | Moderate | Hard | Evil deriving (Show, Read, Eq)
+data Op = Plus | Minus | Multiply | Divide deriving (Show, Eq, Read)
 
 genLatinSquare :: RandomGen g => g -> Int -> (Int -> Int -> [[Int]] -> Int -> Bool) -> [[Int]]
 genLatinSquare gen dim rules = fromJust $ go gen 0 0 zeroes
@@ -66,3 +67,25 @@ sub as bs = [ a | a <- as, a `notElem` bs ]
 
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
 sortOn f = map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _  = [ [] ]
+combinations n xs = [ y:ys | y:xs' <- tails xs , ys <- combinations (n-1) xs']
+
+
+combsWithRep :: Int -> [a] -> [[a]]
+combsWithRep k xs = combsBySize xs !! k
+ where combsBySize = foldr f ([[]] : repeat [])
+       f :: a -> [[[a]]] -> [[[a]]]
+       f x = scanl1 (\z n -> map (x:) z ++ n)
+
+eval :: Op -> [Int] -> Int
+eval op = case op of
+            Plus     -> foldl1' (+)
+            Minus    -> foldl1' (-)
+            Multiply -> foldl1' (*)
+            Divide   -> foldl1' div
+
+
+operations :: [Op]
+operations = [Plus, Minus, Multiply, Divide]
