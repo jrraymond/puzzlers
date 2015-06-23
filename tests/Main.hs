@@ -39,7 +39,7 @@ sudoku_gen d = let (sol, s) = genSudoku (mkStdGen 0) d
 kenken_gen :: Int -> Difficulty -> HU.Test
 kenken_gen n d = let (sol, s) = genKenKen (mkStdGen 0) d n
                      solved = kenken (n,s)
-                 in HU.TestCase (HU.assertEqual (show d) (Just sol) solved)
+                 in HU.TestCase (HU.assertEqual (show d) (Right sol) solved)
 
                                                   
 sudoku_solving_tests :: HU.Test
@@ -55,12 +55,12 @@ kenken_solving_tests = HU.TestList [kenken_easy, kenken_hard]
 
 kenken_easy :: HU.Test
 kenken_easy = HU.TestCase (HU.assertEqual "kenken easy"
-                                          (Just kkEasySol)
+                                          (Right kkEasySol)
                                           (kenken (length kkEasySol,kkEasy)))
 
 kenken_hard :: HU.Test
 kenken_hard = HU.TestCase (HU.assertEqual "kenken hard"
-                                          (Just kkHardSol)
+                                          (Right kkHardSol)
                                           (kenken (length kkHardSol, kkHard)))
 
 

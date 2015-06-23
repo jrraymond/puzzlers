@@ -43,4 +43,5 @@ numHoles g d = let range = case d of
                              Moderate -> [46 .. 49]
                              Hard     -> [50 .. 53]
                              Evil     -> [54 .. 59]
-               in randomElem g range
+                   (x, g') = randomElem g range
+               in (x, g')

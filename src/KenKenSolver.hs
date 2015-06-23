@@ -1,15 +1,15 @@
 module KenKenSolver where
 
-import Data.List (sortBy, tails, elemIndex, permutations, nub)
-import Data.Ord (comparing)
-import Data.Maybe (mapMaybe, fromJust, isJust)
+import Data.List (tails, elemIndex, permutations, nub)
+import Data.Either
+import Data.Maybe (fromJust, isJust)
 import LatinSquare
 import KenKenGenerator
 
 
 
 
-kenken :: (Int, [(Op, Int, [(Int,Int)])]) -> Maybe [[Int]]
+kenken :: (Int, [(Op, Int, [(Int,Int)])]) -> Either Bool [[Int]]
 kenken (dim, cs0) = go cs0'' empty empty zeroes where
   empty = replicate dim []
   zeroes = replicate dim $ replicate dim 0
@@ -18,27 +18,29 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
                                in (op, s, rixs, cixs)) cs0'
 
   combsMemo :: Int -> [[Int]]
-  combsMemo = ((map combs [0 .. dim]) !!)
+  combsMemo = (map combs [0 .. dim] !!)
 
   combs :: Int -> [[Int]]
   combs n = let f | n < 3 = combinations | otherwise = combsWithRep
             in concatMap permutations $ f n [1 .. dim]
 
   go :: [(Op, Int, [Int], [Int])] -> [[Int]] -> [[Int]] 
-        -> [[Int]] -> Maybe [[Int]]
-  go [] _ _ sq = Just sq
+        -> [[Int]] -> Either Bool [[Int]]
+  go [] _ _ sq = Right sq
   go ((op, a, rixs, cixs):cs) rcs ccs sq
-    | length paths /= 1 = Nothing
-    | otherwise = Just $ head paths
-    where opts = nub $ concatMap permutations $
+    | or ls || length rs > 1 = Left True
+    | null rs = Left False
+    | otherwise = Right $ head rs
+    where 
+          opts = nub $ concatMap permutations $
                                  filter (\ns -> a == eval op ns) 
                                         (combsMemo (length rixs))
-          paths = mapMaybe try opts
-          try :: [Int] -> Maybe [[Int]]
-          try [] = Nothing
+          paths = map try opts
+          (ls,rs) = partitionEithers paths
+          try :: [Int] -> Either Bool [[Int]]
+          try [] = Left False
           try xs 
-            | not (ok xs rixs cixs rcs ccs) = Nothing
-            | dups xs rixs cixs = Nothing
+            | not (ok xs rixs cixs rcs ccs) || dups xs rixs cixs = Left False
             | otherwise = go cs rcs' ccs' sq'
             where 
               rcs' = addConstraints xs rixs rcs
@@ -48,7 +50,9 @@ kenken (dim, cs0) = go cs0'' empty empty zeroes where
 
 --returns true if elements share same index
 dups :: [Int] -> [Int] -> [Int] -> Bool
-dups [] rixs cixs = False
+dups [] _ _ = False
+dups _ [] _ = False
+dups _ _ [] = False
 dups (x:xs) (r:rixs) (c:cixs)
   | isJust ixM && (rixs !! ix == r || cixs !! ix == c) = True
   | otherwise = dups xs rixs cixs
@@ -57,13 +61,16 @@ dups (x:xs) (r:rixs) (c:cixs)
 
 
 addConstraints :: [Int] -> [Int] -> [[Int]] -> [[Int]]
-addConstraints [] ixs xss = xss
+addConstraints [] _ xss = xss
+addConstraints _ [] xss = xss
 addConstraints (x:xs) (ix:ixs) xss = let xss' = modRow (x:) ix xss
                                      in addConstraints xs ixs xss'
 
 
 modCells :: [Int] -> [Int] -> [Int] -> [[Int]] -> [[Int]]
-modCells [] rixs cixs sq = sq
+modCells [] _ _ sq = sq
+modCells _ [] _ sq = sq
+modCells _ _ [] sq = sq
 modCells (x:xs) (r:rixs) (c:cixs) sq = let sq' = modCell (const x) r c sq
                                        in modCells xs rixs cixs sq'
 
@@ -79,11 +86,9 @@ combinations 0 _  = [ [] ]
 combinations n xs = [ y:ys | y:xs' <- tails xs , ys <- combinations (n-1) xs']
 
 
-sortOn :: Ord b => (a -> b) -> [a] -> [a]
-sortOn f = map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
-
 combsWithRep :: Int -> [a] -> [[a]]
 combsWithRep k xs = combsBySize xs !! k
  where combsBySize = foldr f ([[]] : repeat [])
-       f x nex = scanl1 (\z n -> map (x:) z ++ n) nex
+       f :: a -> [[[a]]] -> [[[a]]]
+       f x = scanl1 (\z n -> map (x:) z ++ n)
 
