@@ -24,7 +24,7 @@ library
                    , LatinSquare
   -- other-modules:
   -- other-extensions:    
-  build-depends:     base >=4.7 && <4.8
+  build-depends:     base >=4.7 && <5
                    , random
                    , random-shuffle
                    , MonadRandom
@@ -39,7 +39,7 @@ benchmark benchmarks
   HS-Source-Dirs:    benchmarks
   Main-Is:           Main.hs
   GHC-Options:       -O2 -Wall -rtsopts
-  build-Depends:     base >=4.7 && <4.8
+  build-Depends:     base >=4.7 && <5
                    , criterion
                    , random
                    , puzzlers
@@ -50,7 +50,7 @@ test-suite tests
   HS-Source-Dirs:    tests
   Main-Is:           Main.hs
   GHC-Options:       -Wall -rtsopts -O2
-  build-depends:     base >=4.7 && <4.8
+  build-depends:     base >=4.7 && <5
                    , test-framework
                    , test-framework-hunit
                    , HUnit

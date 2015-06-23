@@ -5,17 +5,17 @@ import KenKenSolver
 import System.Random
 import Data.List (partition, intersect, delete)
 import Data.Either (isLeft)
---import Debug.Trace
-
+import Debug.Trace
 
 genKenKen :: RandomGen g => g -> Difficulty -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
-genKenKen g0 diff dim = (sq, try g0 diff sq cages)
+genKenKen g0 diff dim = (sq, try g0 diff sq cages 0)
     where sq = genLatinSquare g0 dim latinSqRules
           cages = genCages g0 dim
-          try :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
-          try g d sq0 cs 
-            | isLeft sol = try (snd $ next g) d sq0 cs
-            | otherwise = ops
+          try :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> Int -> [(Op, Int, [(Int,Int)])]
+          try g d sq0 cs n
+            | trace ("trys: " ++ show n ) False = undefined
+            | isLeft sol = try (snd $ next g) d sq0 cs (n + 1)
+            | otherwise = traceShow sol ops
             where ops = genOps g d sq0 cs
                   sol = kenken (dim, ops)
 
