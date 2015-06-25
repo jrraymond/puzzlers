@@ -43,15 +43,15 @@ sudokuRules r c sq x = let bi = getBoxI r c
                        in notElem x box && latinSqRules r c sq x
 
 
-addConstraint :: Int -> Int -> [[Int]] -> [[Int]]
+addConstraint :: a -> Int -> [[a]] -> [[a]]
 addConstraint x i xss = take i xss ++ [x : (xss !! i)] ++ drop (i + 1) xss
 
 
-modRow :: ([Int] -> [Int]) -> Int -> [[Int]] -> [[Int]]
+modRow :: ([a] -> [a]) -> Int -> [[a]] -> [[a]]
 modRow f i xss = take i xss ++ [f (xss !! i)] ++ drop (i + 1) xss
 
 
-modCell :: (Int -> Int) -> Int -> Int -> [[Int]] -> [[Int]]
+modCell :: (a -> a) -> Int -> Int -> [[a]] -> [[a]]
 modCell f ri ci xss = let xs = xss !! ri
                           c' = f (xs !! ci)
                           xs' = take ci xs ++ c' : drop (ci + 1) xs

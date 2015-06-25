@@ -2,18 +2,21 @@ module SudokuGenerator where
 
 import System.Random
 import System.Random.Shuffle
-import SudokuSolver
-import LatinSquare
 import Data.Maybe (isNothing, mapMaybe, fromJust)
 import Data.Either (isLeft)
+import Data.Char (intToDigit)
 
 
-genSudoku :: RandomGen g => g -> Difficulty -> ([[Int]], [[Int]])
-genSudoku g d = let sq = genLatinSquare g 9 sudokuRules
+import SudokuSolver
+import LatinSquare
+
+
+genSudoku :: RandomGen g => g -> Difficulty -> ([[Char]], [[Char]])
+genSudoku g d = let sq = intsToChars $ genLatinSquare g 9 sudokuRules
                     (n, g') = numHoles g d
                 in (sq, eraseGivens g' n sq)
 
-eraseGivens :: RandomGen g => g -> Int -> [[Int]] -> [[Int]]
+eraseGivens :: RandomGen g => g -> Int -> [[Char]] -> [[Char]]
 eraseGivens g0 n0 s0 
   | isNothing s1 = error "Could not erase sufficient holes"
   | otherwise = fromJust s1
@@ -21,7 +24,7 @@ eraseGivens g0 n0 s0
         dim = length s0
         occupied = [ (ri, ci) | ri <- [0 .. dim - 1]
                               , ci <- [0 .. dim - 1] ]
-        go :: RandomGen g => g -> Int -> [(Int, Int)] -> [[Int]] -> Maybe [[Int]]
+        go :: RandomGen g => g -> Int -> [(Int, Int)] -> [[Char]] -> Maybe [[Char]]
         go _ 0 _ s = Just s
         go g n is s 
           | null paths = Nothing
@@ -30,7 +33,7 @@ eraseGivens g0 n0 s0
             ixs = shuffle' [0 .. length is - 1] (length is) g
             paths = mapMaybe (\ix -> let is' = take ix is ++ drop (ix + 1) is
                                          (r, c) = is !! ix
-                                         s' = modCell (const 0) r c s
+                                         s' = modCell (const '0') r c s
                                      in if isLeft (sudoku s')
                                           then Nothing
                                           else go (snd $ next g) (n - 1) is' s')
@@ -45,3 +48,6 @@ numHoles g d = let range = case d of
                              Evil     -> [54 .. 59]
                    (x, g') = randomElem g range
                in (x, g')
+
+intsToChars :: [[Int]] -> [[Char]]
+intsToChars xs = map (map intToDigit) xs

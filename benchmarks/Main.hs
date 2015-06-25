@@ -52,7 +52,7 @@ getBench fs
   where i = getDiff fs
 
 
-sudokus :: Int -> Int -> [[Int]]
+sudokus :: Int -> Int -> [[Char]]
 sudokus d i = snd (genSudoku (mkStdGen i) (difficulties !! d))
 
 kenkens :: Int -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
