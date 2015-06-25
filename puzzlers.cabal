@@ -22,7 +22,8 @@ library
                    , KenKenSolver
                    , KenKenGenerator
                    , LatinSquare
-  -- other-modules:
+                   , ParseArgs
+  -- other-modules:     
   -- other-extensions:    
   build-depends:     base >=4.7 && <5
                    , random

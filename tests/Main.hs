@@ -1,17 +1,29 @@
 module Main (main) where
 
 import System.Random
+import System.Environment (getArgs, withArgs)
+import Test.Framework (defaultMain, testGroup, Test)
+import Test.Framework.Providers.HUnit
+import qualified Test.HUnit as HU
+
+import ParseArgs
 import LatinSquare
 import SudokuSolver
 import SudokuGenerator
 import KenKenGenerator
 import KenKenSolver
-import Test.Framework (defaultMain, testGroup, Test)
-import Test.Framework.Providers.HUnit
-import qualified Test.HUnit as HU
 
 main :: IO ()
-main = defaultMain tests
+main = do (o,n) <- parseOpts =<< getArgs
+          withArgs n $ defaultMain $ getTests o tests
+
+getTests :: [Flag] -> [Test]
+getTests fs 
+  | Sudoku `elem` fs && Generate `elem` fs = [tests !! 0]
+  | Sudoku `elem` fs && Solve `elem` fs = [tests !! 1]
+  | KenKen `elem` fs && Generate `elem` fs = [tests !! 2]
+  | KenKen `elem` fs && Solve `elem` fs = [tests !! 3]
+  | otherwise = tests
 
 tests :: [Test]
 tests = [ testGroup "Sudoku Generating" (hUnitTestToTests sudoku_gen_tests)
