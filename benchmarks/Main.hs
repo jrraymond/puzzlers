@@ -61,7 +61,7 @@ getBench fs
 options :: [OptDescr (Either String Flag)]
 options = [ Option "p" ["puzzle"] (ReqArg puzzle "Sudoku/KenKen") "sudoku or kenken"
           , Option "a" ["action"] (ReqArg action "Generate/Solve") "generate or solve"
-          , Option "d" ["difficulty"] (ReqArg diff "Diff [0..4]") "difficult levels 0-4"
+          , Option "d" ["difficulty"] (ReqArg diff "[0..4]") "difficult levels 0-4"
           ]
 
 parseOpts :: [String] -> IO ([Flag], [String])
@@ -92,7 +92,7 @@ action s = case readMaybe s of
 
 diff :: String -> Either String Flag
 diff s = case readMaybe s of
-           Just f -> Right f
+           Just x -> Right (Diff x)
            Nothing -> Left "USAGE: -d [--Diff] Diff <0,1,2,3,4>"
 
 sudokus :: Int -> Int -> [[Int]]
