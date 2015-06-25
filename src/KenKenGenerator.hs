@@ -5,25 +5,22 @@ import KenKenSolver
 import System.Random
 import Data.List (partition, intersect, delete)
 import Data.Either (isLeft)
-import Debug.Trace
 
-genKenKen :: RandomGen g => g -> Difficulty -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
-genKenKen g0 diff dim = (sq, try g0 diff sq cages 0)
+genKenKen :: RandomGen g => g -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
+genKenKen g0 dim = (sq, try g0 sq cages)
     where sq = genLatinSquare g0 dim latinSqRules
           cages = genCages g0 dim
-          try :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> Int -> [(Op, Int, [(Int,Int)])]
-          try g d sq0 cs n
-            | trace ("trys: " ++ show n ) False = undefined
-            | isLeft sol = try (snd $ next g) d sq0 cs (n + 1)
-            | otherwise = traceShow sol ops
-            where ops = genOps g d sq0 cs
-                  sol = kenken (dim, ops)
+          try :: RandomGen g => g -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
+          try g sq0 cs
+            | isLeft (kenken (dim, ops)) = try (snd $ next g) sq0 cs
+            | otherwise = ops
+            where ops = genOps g sq0 cs
 
-genOps :: RandomGen g => g -> Difficulty -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
-genOps _ _ _ [] = []
-genOps g0 diff sq (cs:css) = let (f, g1) = randomElem g0 operations
-                                 s = eval f [ sq !! r !! c | (r,c) <- cs] 
-                             in (f, s, cs) : genOps g1 diff sq css
+genOps :: RandomGen g => g -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
+genOps _ _ [] = []
+genOps g0 sq (cs:css) = let (f, g1) = randomElem g0 operations
+                            s = eval f [ sq !! r !! c | (r,c) <- cs] 
+                        in (f, s, cs) : genOps g1 sq css
 
 
 genCages :: RandomGen g => g -> Int -> [[(Int,Int)]]

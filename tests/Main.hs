@@ -20,14 +20,11 @@ tests = [ testGroup "Sudoku Generating" (hUnitTestToTests sudoku_gen_tests)
         , testGroup "KenKen Solving" (hUnitTestToTests kenken_solving_tests)
         ]
 
-difficulties :: [Difficulty]
-difficulties = [Easiest, Easy, Moderate, Hard, Evil]
-
 sudoku_gen_tests :: HU.Test
 sudoku_gen_tests = HU.TestList $ map sudoku_gen difficulties
 
 kenken_gen_tests :: HU.Test
-kenken_gen_tests = HU.TestList $ map (kenken_gen 4) difficulties
+kenken_gen_tests = HU.TestList $ [kenken_gen 4, kenken_gen 6]
 
 
 sudoku_gen :: Difficulty -> HU.Test
@@ -36,10 +33,10 @@ sudoku_gen d = let (sol, s) = genSudoku (mkStdGen 0) d
                in HU.TestCase (HU.assertEqual (show d) (Right sol) solved)
 
 
-kenken_gen :: Int -> Difficulty -> HU.Test
-kenken_gen n d = let (sol, s) = genKenKen (mkStdGen 0) d n
-                     solved = kenken (n,s)
-                 in HU.TestCase (HU.assertEqual (show d) (Right sol) solved)
+kenken_gen :: Int -> HU.Test
+kenken_gen n = let (sol, s) = genKenKen (mkStdGen 0) n
+                   solved = kenken (n,s)
+               in HU.TestCase (HU.assertEqual (show n) (Right sol) solved)
 
                                                   
 sudoku_solving_tests :: HU.Test

@@ -4,9 +4,14 @@ import System.Random
 import Data.Maybe (fromJust, mapMaybe)
 import Data.List (foldl1', tails, intercalate, sortBy)
 import Data.Ord (comparing)
+import Control.DeepSeq
 
 data Difficulty = Easiest | Easy | Moderate | Hard | Evil deriving (Show, Read, Eq)
 data Op = Plus | Minus | Multiply | Divide deriving (Show, Eq, Read)
+
+instance NFData Op where
+    rnf x = x `seq` ()
+
 
 genLatinSquare :: RandomGen g => g -> Int -> (Int -> Int -> [[Int]] -> Int -> Bool) -> [[Int]]
 genLatinSquare gen dim rules = fromJust $ go gen 0 0 zeroes
@@ -68,6 +73,9 @@ sub as bs = [ a | a <- as, a `notElem` bs ]
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
 sortOn f = map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
 
+mapFst :: (a -> b) -> (a,c) -> (b,c)
+mapFst f (a,c) = (f a, c)
+
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _  = [ [] ]
 combinations n xs = [ y:ys | y:xs' <- tails xs , ys <- combinations (n-1) xs']
@@ -89,3 +97,6 @@ eval op = case op of
 
 operations :: [Op]
 operations = [Plus, Minus, Multiply, Divide]
+
+difficulties :: [Difficulty]
+difficulties = [Easiest, Easy, Moderate, Hard, Evil]
