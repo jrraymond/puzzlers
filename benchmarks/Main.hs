@@ -37,16 +37,20 @@ kkGs = [ bench "kenken gen 4x4" $ nf (genKenKen (mkStdGen 0)) 4
        , bench "kenken gen 6x6" $ nf (genKenKen (mkStdGen 0)) 6
        ]
 kkSs :: [Benchmark]
-kkSs = [ bench "kenken solve 4x4" $ nf kenken (mapFst length $ kenkens 4 0)
-       , bench "kenken solve 6x6" $ nf kenken (mapFst length $ kenkens 6 0)
+kkSs = [ bench "kenken solve 4x4" $ nf (kenken 1) (mapFst length $ kenkens 4 0)
+       , bench "kenken solve 6x6" $ nf (kenken 1) (mapFst length $ kenkens 6 0)
        ]
 
 getBench :: [Flag] -> Benchmark
 getBench [] = bgroup "running all" $ suGs ++ suSs ++ kkGs ++ kkSs
 getBench fs 
+  | Sudoku `elem` fs && Generate `elem` fs && i < 0 = bgroup "sudoku generate all" suGs
   | Sudoku `elem` fs && Generate `elem` fs = suGs !! i
+  | Sudoku `elem` fs && i < 0 = bgroup "sudoku solve all" suSs
   | Sudoku `elem` fs = suSs !! i
+  | KenKen `elem` fs && Generate `elem` fs && i < 0 = bgroup "kenken gen all" kkGs
   | KenKen `elem` fs && Generate `elem` fs = kkGs !! (min i (length kkGs - 1))
+  | KenKen `elem` fs && i < 0 = bgroup "kenken solve all" kkSs
   | KenKen `elem` fs = kkSs !! (min i (length kkSs - 1))
   | otherwise = error "incorrect flags"
   where i = getDiff fs

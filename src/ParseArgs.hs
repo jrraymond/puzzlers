@@ -12,7 +12,7 @@ data Flag = Sudoku | KenKen | Generate | Solve | Diff Int deriving (Read, Show, 
 options :: [OptDescr (Either String Flag)]
 options = [ Option "p" ["puzzle"] (ReqArg puzzle "Sudoku/KenKen") "sudoku or kenken"
           , Option "a" ["action"] (ReqArg action "Generate/Solve") "generate or solve"
-          , Option "d" ["difficulty"] (ReqArg diff "[0..4]") "difficult levels 0-4"
+          , Option "d" ["difficulty"] (OptArg diff "[0..4]") "difficult levels 0-4"
           ]
           
 parseOpts :: [String] -> IO ([Flag], [String])
@@ -41,8 +41,9 @@ action s = case readMaybe s of
              Just f  -> Right f
              Nothing -> Left "USAGE: -a [--action] <Generate/Solve>"
 
-diff :: String -> Either String Flag
-diff s = case readMaybe s of
-           Just x -> Right (Diff x)
-           Nothing -> Left "USAGE: -d [--Diff] Diff <0,1,2,3,4>"
+diff :: Maybe String -> Either String Flag
+diff Nothing = Right (Diff (-1))
+diff (Just s) = case readMaybe s of
+                   Just x -> Right (Diff x)
+                   Nothing -> Left "USAGE: -d [--Diff] Diff <0,1,2,3,4>"
 
