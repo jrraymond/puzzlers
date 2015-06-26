@@ -27,7 +27,7 @@ parseOpts argv =
 
 
 getDiff :: [Flag] -> Int
-getDiff [] = error "no difficulty in flags"
+getDiff [] = (-1)
 getDiff (Diff x:_) = x
 getDiff fs = getDiff (tail fs)
 
