@@ -7,14 +7,16 @@ import Data.List (partition, intersect, delete)
 import Data.Either (isLeft)
 
 genKenKen :: RandomGen g => g -> Int -> ([[Int]], [(Op, Int, [(Int,Int)])])
-genKenKen g0 dim = (sq, try g0 sq cages)
+genKenKen g0 dim = (sq, try g0 0 sq cages)
     where sq = genLatinSquare g0 dim latinSqRules
           cages = genCages g0 dim
-          try :: RandomGen g => g -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
-          try g sq0 cs
-            | isLeft (kenken (dim, ops)) = try (snd $ next g) sq0 cs
+          try :: RandomGen g => g -> Int -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
+          try g n sq0 cs
+            | n > 99 = error "could not generate unique kenken after 10 trys"
+            | isLeft (kenken (dim, ops)) = try (snd $ next g) (n + 1) sq0 cs'
             | otherwise = ops
             where ops = genOps g sq0 cs
+                  cs' = genCages g dim
 
 genOps :: RandomGen g => g -> [[Int]] -> [[(Int,Int)]] -> [(Op, Int, [(Int,Int)])]
 genOps _ _ [] = []

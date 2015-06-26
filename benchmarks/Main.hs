@@ -37,8 +37,8 @@ kkGs = [ bench "kenken gen 4x4" $ nf (genKenKen (mkStdGen 0)) 4
        , bench "kenken gen 6x6" $ nf (genKenKen (mkStdGen 0)) 6
        ]
 kkSs :: [Benchmark]
-kkSs = [ bench "kenken solve 4x4" $ nf (kenken 1) (mapFst length $ kenkens 4 0)
-       , bench "kenken solve 6x6" $ nf (kenken 1) (mapFst length $ kenkens 6 0)
+kkSs = [ bench "kenken solve 4x4" $ nf kenken (mapFst length $ kenkens 4 0)
+       , bench "kenken solve 6x6" $ nf kenken (mapFst length $ kenkens 6 0)
        ]
 
 getBench :: [Flag] -> Benchmark
