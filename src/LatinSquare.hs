@@ -100,3 +100,7 @@ operations = [Plus, Minus, Multiply, Divide]
 
 difficulties :: [Difficulty]
 difficulties = [Easiest, Easy, Moderate, Hard, Evil]
+
+(!!!) :: [[a]] -> [(Int,Int)] -> [a]
+xs !!! [] = []
+xs !!! ((r,c):is) = xs !! r !! c : xs !!! is
