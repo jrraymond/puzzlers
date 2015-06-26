@@ -7,7 +7,7 @@ synopsis:            Automatic puzzle generation and solutions.
 -- description:         
 homepage:            jrraymond.github.io
 -- license:             
-license-file:        LICENSE
+-- license-file:        LICENSE
 author:              Justin Raymond
 maintainer:          justin.raymond.14@gmail.com
 -- copyright:           
