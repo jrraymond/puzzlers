@@ -2,6 +2,8 @@
 ~.swo
 ~.swp
 
+TODO.txt
+
 # cabal
 dist
 cabal-dev
